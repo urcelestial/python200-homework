@@ -69,6 +69,9 @@ my_thermometer.add(80.0)
 my_thermometer.add(68.5)
 
 print(my_thermometer)
+thermometer_a = Thermometer("Philly", [62.5, 72.0])
+thermometer_b = Thermometer("Boston", [55.0, 61.0])
+print([thermometer_a, thermometer_b])
 
 # When our class does not have __repr__ it shows default memory references 
 # such as <__main__.Thermometer object at 0x109b95d30>. It is not helpful for
@@ -90,9 +93,12 @@ class TemperatureAlert:
 
 philly_thermometer = Thermometer("Philly", [25.0, 32.0, 28.5, 35.0])
 alert = TemperatureAlert(threshold=30.0)
+cooler_alert = TemperatureAlert(threshold=26.0)
 
 results = alert.breaches(philly_thermometer)
 print(results)  # Prints: [32.0, 35.0]
+cooler_results = cooler_alert.breaches(philly_thermometer)
+print(cooler_results)  # Prints: [32.0, 28.5, 35.0]
 
 # Storing threshold on TemperatureAlert configures the alert object with a fixed boundary rule. 
 # The advantage when checking twenty thermometers is that you set the threshold once when 
@@ -106,6 +112,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Station:
+    """Represents a weather station and its location and elevation."""
     station_id: str
     name: str
     latitude: float
@@ -195,13 +202,19 @@ class StationBatch:
 # ---------- Pydantic --------- 
 
 # Q1
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 class Reading(BaseModel):
     station_id: str = Field(min_length=3)
     timestamp: str
     temperature_c: float = Field(ge=-90.0, le=60.0)
     humidity: float = Field(ge=0, le=100)
+
+    @model_validator(mode="after")
+    def reject_extreme_dry_cold_reading(self):
+        if self.humidity == 0.0 and self.temperature_c < -40:
+            raise ValueError("A reading below -40°C cannot have zero humidity")
+        return self
 
 # One valid reading
 reading = Reading(
@@ -269,6 +282,7 @@ print("\n")
 print(new_reading)
 print(type(new_reading.temperature_c))
 print(type(new_reading.humidity))
+# Pydantic coerces numeric strings to numbers when the target field type allows it.
 
 
 # Q3
@@ -284,6 +298,15 @@ except ValidationError as e:
     for err in e.errors():
         print("Location:", err["loc"])
         print("Message:", err["msg"])
+# Three validation errors are reported (short station_id, missing timestamp, invalid temperature); seeing them together helps fix all invalid fields in one pass.
+
+# Q4
+valid_warmup = Reading(station_id="amtrak21", timestamp="2026-10-05", temperature_c=-20, humidity=0)
+print(valid_warmup)
+try:
+    Reading(station_id="amtrak21", timestamp="2026-10-05", temperature_c=-41, humidity=0)
+except ValidationError as e:
+    print(e)
 
 
 
@@ -316,6 +339,7 @@ def mean(values: list[float]) -> float:
 
 
 def test_mean_of_empty_raises():
+    # match= checks the exception message, catching the wrong ValueError reason that a bare check misses.
     with pytest.raises(ValueError, match="empty"):
         mean([])
 
@@ -329,6 +353,10 @@ def test_mean_of_empty_raises():
 ])
 def test_mean_values(numbers, expected_mean):
     assert mean(numbers) == expected_mean
+
+# Run with: pytest warmup_01.py -v
+# ============================== 6 passed in 0.36s ===============================
+# Parametrization keeps shared assertions in one test while clearly listing each input and expected result.
 
 # Q4
 
