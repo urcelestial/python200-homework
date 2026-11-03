@@ -31,6 +31,8 @@ x = np.array([10, 20, 30, 40, 50])
 print("Original x shape:", x.shape)
 x_2d = x.reshape(-1, 1)
 print("Reshaped x shape:", x_2d.shape)
+# scikit-learn expects X to be a 2D table: rows are examples and columns are
+# features. Here the 1D list becomes five rows with one feature per row.
 
 
 
@@ -49,6 +51,9 @@ plt.ylabel("Daily High Temperature (°C)")
 plt.tight_layout()
 plt.savefig(OUTPUTS_DIR / "high_vs_low.png")
 plt.close()
+# The points form two visible color groups, corresponding to rainy and dry
+# days. Both groups generally rise as the daily low rises, while rainy days
+# tend to have lower daily highs than dry days at similar lows.
 
 # Q2
 X = temp_min.reshape(-1, 1)
@@ -71,6 +76,8 @@ print("Slope:", model.coef_[0])
 print("Intercept:", model.intercept_)
 print("RMSE:", rmse)
 print("Test R²:", r2_baseline)
+# The positive slope means each 1°C increase in the daily low is associated
+# with an increase of about `model.coef_[0]`°C in the predicted daily high.
 
 # Q4
 X_full = np.column_stack([temp_min, is_rainy])
@@ -85,6 +92,9 @@ print("One-feature test R²:", r2_baseline)
 print("Two-feature test R²:", r2_full)
 print("temp_min coefficient:", model_full.coef_[0])
 print("is_rainy coefficient:", model_full.coef_[1])
+# Since is_rainy is 1 for rainy days and 0 otherwise, its coefficient is the
+# predicted high-temperature difference for rainy versus dry days at the same
+# daily low. A negative value means rain lowers the prediction by that many °C.
 
 # Q5
 plt.figure(figsize=(6, 6))
