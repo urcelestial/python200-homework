@@ -41,6 +41,8 @@ def test_temp_max_and_min_are_correct(sample_readings):
     aggregator = DailyAggregator(min_hours=24)
     summaries = aggregator.summarize(sample_readings)
     # Day 1 temperatures range from 10.0 to 14.0 based on (10.0 + (hour % 5))
+    # I deliberately broke DailyAggregator.summarize's max calculation by
+    # subtracting 1; test_temp_max_and_min_are_correct failed (13.0 vs 14.0).
     assert summaries[0].temp_min == 10.0
     assert summaries[0].temp_max == 14.0
 
