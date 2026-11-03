@@ -308,6 +308,8 @@ try:
 except ValidationError as e:
     print(e)
 
+# Q4: Field constraints check individual values, but this rule depends on a
+# relationship between two fields, so it needs a model_validator.
 
 
 
@@ -370,6 +372,8 @@ FAILED warmup_01.py::test_celsius_to_fahrenheit - assert 257.0 == 212.0
  E  AssertionError: assert 257.0 == 212.0
  E   +  where 257.0 = celsius_to_fahrenheit(100)
 """
+# Pytest showed the computed value (257.0) beside the expected value (212.0),
+# which pinpoints the discrepancy instead of only reporting "assertion failed."
 
 def celsius_to_fahrenheit(celsius: float) -> float:
     """Converts a temperature from Celsius to Fahrenheit."""
