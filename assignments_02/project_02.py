@@ -72,12 +72,18 @@ plt.ylabel("Daily High Temperature (°C)")
 plt.tight_layout()
 plt.savefig(OUTPUTS_DIR / "high_vs_low_project.png")
 plt.close()
+# The scatter shows a clear positive relationship: days with warmer lows tend
+# to have warmer highs. The points cluster around this upward trend, with some
+# spread showing that the low alone does not explain every day's high.
 
 # Task 3: flag summer months (June, July, and August).
 df["is_summer"] = df["date"].dt.month.isin([6, 7, 8]).astype(int)
 summer_counts = df["is_summer"].value_counts().sort_index()
 print("Non-summer days:", summer_counts.get(0, 0))
 print("Summer days:", summer_counts.get(1, 0))
+# I expect is_summer to help predict the daily high because June through
+# August are generally warmer in Charlotte than the rest of the year. It can
+# capture that seasonal shift even when two days have similar daily lows.
 
 
 # Task 4: baseline model using only the daily low.
@@ -94,6 +100,9 @@ baseline_r2 = baseline_model.score(X_test, y_test)
 print("Baseline slope:", baseline_model.coef_[0])
 print("Baseline RMSE (°C):", baseline_rmse)
 print("Baseline test R²:", baseline_r2)
+# The baseline RMSE is measured in °C, so it describes a typical prediction
+# error in familiar temperature units: predictions are usually about
+# `baseline_rmse`°C away from the observed daily high.
 
 
 # Task 5: add precipitation, wind, and the seasonal indicator.
