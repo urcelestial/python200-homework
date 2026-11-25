@@ -1,0 +1,15 @@
+{
+  "python_version": "3.14.6",
+  "scikit_learn_version": "1.9.1",
+  "feature_names": [
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "precipitation_sum",
+    "wind_speed_10m_max"
+  ],
+  "label_rule": "good_for_running=1 when temperature_2m_max is 7\u201326 \u00b0C, temperature_2m_min >= 0 \u00b0C, precipitation_sum < 3 mm, and wind_speed_10m_max < 30 km/h; otherwise 0.",
+  "city": "Charlotte, North Carolina",
+  "test_accuracy": 0.9726027397260274,
+  "test_f1": 0.9655172413793104,
+  "model": "KNeighborsClassifier pipeline with StandardScaler (k=3)"
+}
